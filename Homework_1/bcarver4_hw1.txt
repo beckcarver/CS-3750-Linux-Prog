@@ -48,3 +48,16 @@ grep -w Grade `find . -name "*.txt*"`
 # ./grade_1.txt:see, im Grade
 # ./tom3.txt:this tom3 file also has the word Grade
 
+### PROBLEM 5 ###
+# I believe here again you could use `find ...` instead of typing names manually
+
+cat tr1.txt tr2.txt tr3.txt | tr [A-Z] [a-z]
+
+# My output:
+# help this is stuck in all caps
+# and this was already lowercase
+# this has alternating case
+# this has a single capital letter 'g' and everything else is lowercase
+
+### PROBLEM 6 ###
+
