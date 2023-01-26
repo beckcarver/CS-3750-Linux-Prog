@@ -1,9 +1,9 @@
 # shell define thingy
 
 
-### problem 1 ###
+### PROBLEM 1 ###
 # quotes are important so that find is passed the entire expression vs
-# the wildcard generating for the level the command is called from
+# the wildcard only generating for the level the command is called from
 
 find . -name '*.tex'
 
@@ -14,7 +14,10 @@ find . -name '*.tex'
 # ./tex_test/tex_test_2/level_2_f1.tex
 # ./tex_test/tex_test_2/tex_test_3/level_3_f1.tex
 
-### problem 2 ###
+### PROBLEM 2 ###
+# you could also do grep -w -n tomato `find . -name "*.txt*"`
+# where the ``(back quotes) run find before grep to save addition time writing file names
+# both commands give the same output shown below
 
 grep -w -n tomato tom1.txt tom2.txt tom3.txt tom4.txt
 
@@ -22,3 +25,26 @@ grep -w -n tomato tom1.txt tom2.txt tom3.txt tom4.txt
 # tom1.txt:2:I could have eaten tomato after tomato, but alas that course only had three.
 # tom2.txt:3:this line contains tomato but the next contains "Tomato", maybe you see it, maybe you don't
 # tom4.txt:3:tomato
+
+### PROBLEM 3 ###
+# again i could use `find ...` instead of writing the names, but as requested
+# my command is below
+
+grep -w -v pepper tom1.txt tom2.txt tom3.txt tom4.txt | wc -l
+
+# My output:
+# 15
+
+### PROBLEM 4 ###
+# hey look, I accidentally solved this ahead of time in problem 2, unix shell is actually fun
+# my solution doesn't use -exec though, I hope that's okay
+
+grep -w Grade `find . -name "*.txt*"`
+
+# My output:
+# ./grade_2.txt:this line has Grade, but the next has 'Grade', do you see it?
+# ./grade_2.txt:'Grade'
+# ./grade_1.txt:this line has grade in it but the next has 'Grade' do you see it?
+# ./grade_1.txt:see, im Grade
+# ./tom3.txt:this tom3 file also has the word Grade
+
