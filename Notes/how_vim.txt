@@ -14,6 +14,7 @@ command mode:
      dd - delete line
 [num]dd - delete # of lines
 
-find string stuff:
-/string - finds match string "n" to go to next item "N" go previous, "i" to begin editing from there
-:%s/string/replacer/("g" to do all)("c" to confirm each) - find and replace 	
+'advanceder' commands:
+/set number - adds line numbers
+/{string} - finds match string "n" to go to next item "N" go previous, "i" to begin editing from there
+:%s/{string}/{new string}/{"g" to do all}{"c" to confirm each} - find and replace 	
