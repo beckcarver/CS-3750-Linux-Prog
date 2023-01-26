@@ -1,0 +1,16 @@
+Things to learn:
+- how to use VIM
+- basics of UNIX command line
+- UNIX man pages
+- basics of UNIX scripting
+
+# problem #1
+find . -name \*.tex
+
+# My output:
+# ./tex_test/level_1_f2.tex
+# ./tex_test/level_1_f1.tex
+# ./tex_test/tex_test_alt/level_alt_f1.tex
+# ./tex_test/tex_test_2/level_2_f1.tex
+# ./tex_test/tex_test_2/tex_test_3/level_3_f1.tex
+

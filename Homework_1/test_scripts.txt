@@ -1,5 +1,0 @@
-Things to learn:
-- how to use VIM
-- basics of UNIX command line
-- UNIX man pages
-- basics of UNIX scripting
