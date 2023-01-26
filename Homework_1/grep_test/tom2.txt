@@ -1,0 +1,4 @@
+i am a vegetable
+i am a fruit
+this line contains tomato but the next contains "Tomato", maybe you see it, maybe you don't
+Tomato

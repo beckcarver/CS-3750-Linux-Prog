@@ -1,11 +1,11 @@
-Things to learn:
-- how to use VIM
-- basics of UNIX command line
-- UNIX man pages
-- basics of UNIX scripting
+# shell define thingy
 
-# problem #1
-find . -name \*.tex
+
+### problem 1 ###
+# quotes are important so that find is passed the entire expression vs
+# the wildcard generating for the level the command is called from
+
+find . -name '*.tex'
 
 # My output:
 # ./tex_test/level_1_f2.tex
@@ -14,3 +14,11 @@ find . -name \*.tex
 # ./tex_test/tex_test_2/level_2_f1.tex
 # ./tex_test/tex_test_2/tex_test_3/level_3_f1.tex
 
+### problem 2 ###
+
+grep -w -n tomato tom1.txt tom2.txt tom3.txt tom4.txt
+
+# My output:
+# tom1.txt:2:I could have eaten tomato after tomato, but alas that course only had three.
+# tom2.txt:3:this line contains tomato but the next contains "Tomato", maybe you see it, maybe you don't
+# tom4.txt:3:tomato
