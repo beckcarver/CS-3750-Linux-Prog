@@ -15,9 +15,8 @@ find . -name '*.tex'
 # ./tex_test/tex_test_2/tex_test_3/level_3_f1.tex
 
 ### PROBLEM 2 ###
-# you could also do grep -w -n tomato `find . -name "*.txt*"`
-# where the ``(back quotes) run find before grep to save addition time writing file names
-# both commands give the same output shown below
+# you could also do grep -w -n tomato `find . -name "*.txt*"`# where the ``(back quote) 
+# run find before the command is executed and places its output in the command
 
 grep -w -n tomato tom1.txt tom2.txt tom3.txt tom4.txt
 
