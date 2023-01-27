@@ -1,62 +1,31 @@
-# shell define thingy
+# Beckham Carver HW1 
+# problem titles/headers also work as runnable echo statements if that's any help when grading
 
 
-### PROBLEM 1 ###
-# quotes are important so that find is passed the entire expression vs
-# the wildcard only generating for the level the command is called from
-
+# echo ~~~~~~~~~~ problem 1
 find . -name '*.tex'
 
-# My output:
-# ./tex_test/level_1_f2.tex
-# ./tex_test/level_1_f1.tex
-# ./tex_test/tex_test_alt/level_alt_f1.tex
-# ./tex_test/tex_test_2/level_2_f1.tex
-# ./tex_test/tex_test_2/tex_test_3/level_3_f1.tex
 
-### PROBLEM 2 ###
-# you could also do grep -w -n tomato `find . -name "*.txt*"`# where the ``(back quote) 
-# run find before the command is executed and places its output in the command
-
+# echo ~~~~~~~~~~ problem 2
 grep -w -n tomato tom1.txt tom2.txt tom3.txt tom4.txt
 
-# My output:
-# tom1.txt:2:I could have eaten tomato after tomato, but alas that course only had three.
-# tom2.txt:3:this line contains tomato but the next contains "Tomato", maybe you see it, maybe you don't
-# tom4.txt:3:tomato
 
-### PROBLEM 3 ###
-# again i could use `find ...` instead of writing the names, but as requested
-# my command is below
-
+# echo ~~~~~~~~~~ problem 3
 grep -w -v pepper tom1.txt tom2.txt tom3.txt tom4.txt | wc -l
 
-# My output:
-# 15
 
-### PROBLEM 4 ###
-# hey look, I accidentally solved this ahead of time in problem 2, unix shell is actually fun
-# my solution doesn't use -exec though, I hope that's okay
-
+# echo ~~~~~~~~~~ problem 4
 grep -w Grade `find . -name "*.txt*"`
 
-# My output:
-# ./grade_2.txt:this line has Grade, but the next has 'Grade', do you see it?
-# ./grade_2.txt:'Grade'
-# ./grade_1.txt:this line has grade in it but the next has 'Grade' do you see it?
-# ./grade_1.txt:see, im Grade
-# ./tom3.txt:this tom3 file also has the word Grade
 
-### PROBLEM 5 ###
-# I believe here again you could use `find ...` instead of typing names manually
-
+# echo ~~~~~~~~~~ problem 5
 cat tr1.txt tr2.txt tr3.txt | tr [A-Z] [a-z]
 
-# My output:
-# help this is stuck in all caps
-# and this was already lowercase
-# this has alternating case
-# this has a single capital letter 'g' and everything else is lowercase
 
-### PROBLEM 6 ###
+# echo ~~~~~~~~~~ problem 6
+# I would really like to see how this problem is solved on one line, I could not find a way to set an any char delimeter
+cut -c 1-5 sort1.txt sort2.txt | sort
+
+# echo ~~~~~~~~~~ problem 7
+cut -c 2 sort1.txt sort2.txt | sort -u -r
 
