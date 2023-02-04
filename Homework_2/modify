@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# if empty arguments
+if [ $# -eq 0 ]; then	
+	echo "usage: modify filename [filename ...]"
+       	exit 1
+fi
+
+# if arguments present
+for filename in "$@"; do
+	# if directory
+	if [ -d "$filename" ]; then
+		echo "modify: $filename, is a directory."
+
+	# if executable
+	elif [ -x "$filename" ]; then
+    		echo "modify: $filename, cannot edit executables."
+
+	# if ASCII text
+	elif [ -f "$filename" ] && file "$filename" | grep -q "ASCII text"; then
+		# set time at write time
+		date_time="$(date +"%A, %b %d, %Y: %H%M")"
+		
+		# first write date and name to end of file
+		ed -s "$filename" << END > /dev/null
+\$a
+Modified on: $date_time
+Modified by: Beckham Carver
+.
+w
+q
+END
+		
+		# then swap 1/2 lines
+		ed -s "$filename" << END > /dev/null
+2m0
+w
+q
+END
+
+		# then search for Gradez and switch to 's' 
+		ed -s "$filename" << END > /dev/null 
+1,\$s/Gradez/Grades/g
+w
+q
+END
+	# unsupported file type
+	else
+    		echo "modify: $filename, filetype not supported."
+
+fi
+
+
+done
