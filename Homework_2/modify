@@ -1,4 +1,10 @@
 #!/bin/sh
+# Beckham Carver
+# HW2, CS 3750
+# Feb 3, 2023
+
+# Script that takes filenames as arguments and appends edit date and name to end of file
+# among other small tasks
 
 # if empty arguments
 if [ $# -eq 0 ]; then	
