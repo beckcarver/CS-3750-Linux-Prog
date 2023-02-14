@@ -10,7 +10,7 @@
 ##################################
 
 CC = gcc
-CFLAGS = -ggdb -Wall
+CFLAGS = -ggdb -Wall -I.
 OBJS = prompt.o compute.o display.o
 
 # reference to clean and tidy recipes
@@ -30,7 +30,7 @@ prompt.o: prompt.c prompt.h
 
 # create approxe using approxe.c, compile with CC/CFLAGS + '-I'
 approxe: ${OBJS} approxe.c
-	${CC} ${CFLAGS} -Iinclude ${OBJS} approxe.c -o approxe
+	${CC} ${CFLAGS} ${OBJS} approxe.c -o approxe
 
 
 # remove OBJS, and approxe
