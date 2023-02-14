@@ -9,28 +9,29 @@
 # long winded.
 ##################################
 
-CC = gcc
-CFLAGS = -ggdb -Wall -I.
-OBJS = prompt.o compute.o display.o
+CC=gcc
+CFLAGS=-g -Wall -I.
+OBJS=prompt.o compute.o display.o
+
 
 # reference to clean and tidy recipes
 .PHONY: clean tidy
 
-# create compute.o using compute files, compile with CC/FLAGS + '-c'
-compute.o: compute.c compute.h
-	${CC} ${CFLAGS} -c compute.c compute.h
-
-# create display.o using display files, compile with CC/CFLAGS + '-c'
-display.o: display.c display.h
-	${CC} ${CFLAGS} -c display.c display.h
-
-# create prompt.o using prompt files, compile with CC/CFLAGS + '-c'
-prompt.o: prompt.c prompt.h
-	${CC} ${CFLAGS} -c prompt.c prompt.h
-
 # create approxe using approxe.c, compile with CC/CFLAGS + '-I'
 approxe: ${OBJS} approxe.c
 	${CC} ${CFLAGS} ${OBJS} approxe.c -o approxe
+
+# create compute.o using compute files, compile with CC/FLAGS + '-c'
+compute.o: compute.h compute.c
+	${CC} ${CFLAGS} -c compute.c
+
+# create display.o using display files, compile with CC/CFLAGS + '-c'
+display.o: display.h display.c
+	${CC} ${CFLAGS} -c display.c
+
+# create prompt.o using prompt files, compile with CC/CFLAGS + '-c'
+prompt.o: prompt.h prompt.c
+	${CC} ${CFLAGS} -c prompt.c
 
 
 # remove OBJS, and approxe
