@@ -1,0 +1,30 @@
+# Author: Beckham Carver
+#
+# psuedocode for HW4
+#
+# items in () are code snippets/reminders for my future use
+
+using the libraries needed (likely stdio & others)
+
+define function intoOut
+    read from standard input
+    write to standard output
+
+if no arguments (argc is 0)
+	call intoOut
+
+otherwise for each argument (argv[])
+    using READ ONLY (O_RDONLY)
+    IF current argument is '-'
+        call intoOut 
+    IF-ELSE open current argument AND no errors
+        read all files into buffer (using fread, 4096 bytes)
+        read standard input
+        write to standard output (using fwrite())
+    ELSE
+        print that argument was invalid or file was unreadable
+
+close all files
+             
+    
+    
