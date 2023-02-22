@@ -17,7 +17,7 @@ CFLAGS=-g -Wall -I.
 
 # create approxe using approxe.c, compile with CC/CFLAGS + '-I'
 wycat: wycat.c
-        ${CC} ${CFLAGS} wycat.c -o wycat
+	${CC} ${CFLAGS} wycat.c -o wycat
 
 # remove OBJS, and approxe
 tidy:
