@@ -16,62 +16,73 @@
 #include <errno.h>
 
 
-// similar getline loop from man getline(3) but it never worked so I started
-// fresh- and now they look nearly identical again
-int intoOut(int buffsize);
+void intoOut(int buffsize);
 
 int main(int argc, char* argv[]) {
     const int BUFFSIZE = 4096;
+    
     if(argc <= 1) {
         intoOut(BUFFSIZE);
+        return 0;
     }
-    else {
+    
+    // DEBUG
+    for (int i = 1; i < argc; i++) {
+        printf(argv[i]);
+        printf("  ");
+    }
+    printf("\n end of args \n");
+    // DEBUG
+
+    for (int i = 1; i < argc; i++) {
+     
+        FILE *stream;
         
-        // debug
-        for (int i = 1; i < argc; i++) {
-            printf(argv[i]);
-            printf("  ");
+        if(!strcmp(argv[i], "-")) {
+            // dash in arguments
+            intoOut(BUFFSIZE);
         }
-        printf("\n end of args \n");
-
-
-        for (int i = 1; i < argc; i++) {
-         
-            FILE *stream = fopen(argv[i], "r");
-            
-            if(!strcmp(argv[i], "-")) {
-                intoOut(BUFFSIZE);
-            }
-            else if (stream != NULL) {
-                // file is readable
-                printf("\n reading file \n");
-                char *buffer = malloc(BUFFSIZE);
-                size_t read = fread(buffer, sizeof(char), BUFFSIZE, stream);
-                fwrite(buffer, sizeof(char), read, stdout);
-                free(buffer);
-                fclose(stream);
-            }
-            else {
-                // file unreadable
-                char *errInput = argv[i];
-                perror(errInput);
-            }        
+        else if ((stream = fopen(argv[i], "r")) != NULL) {
+            // file is readable
+            char *buffer = malloc(BUFFSIZE);
+            size_t read;
+            while((read = fread(buffer, sizeof(char), BUFFSIZE, stream)) != 0){
+                int written = fwrite(buffer, sizeof(char), read, stdout);
+                if (written != read) {
+                    perror(strcat("different vals read/written from ", argv[i]));
+                    break;
+                }
+            }    
+            free(buffer);
+            fclose(stream);
         }
+        else {
+            // file unreadable
+            char *errInput = argv[i];
+            perror(errInput);
+        }        
     }
     return 0;
 }
 
-int intoOut(int buffsize) {
+
+void intoOut(int buffsize) {
     char *buffer = malloc(buffsize);
-    size_t len = buffsize;
     size_t read;
+    size_t len;
+   
+    // this took my so long to figure out, without it, one use of cntl+d means
+    // all subsequent readings of stdin terminate early, ie. no multiple -`s
+    clearerr(stdin);
     
     while((read = getline(&buffer, &len, stdin)) != -1) {
-        fwrite(buffer, sizeof(char), read, stdout);
+        int written = fwrite(buffer, sizeof(char), read, stdout);
+        if (written != read) {
+            perror("different vals read/written from stdin");
+        }
     }
-    
+
     free(buffer);
-    return 0;
 }
 
 
