@@ -19,6 +19,7 @@
 void intoOut(int buffsize);
 
 int main(int argc, char* argv[]) {
+    
     const int BUFFSIZE = 4096;
     
     if(argc <= 1) {
@@ -26,14 +27,6 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     
-    // DEBUG
-    for (int i = 1; i < argc; i++) {
-        printf(argv[i]);
-        printf("  ");
-    }
-    printf("\n end of args \n");
-    // DEBUG
-
     for (int i = 1; i < argc; i++) {
      
         FILE *stream;
