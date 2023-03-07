@@ -1,0 +1,33 @@
+# Author: Beckham Carver
+#
+# psuedocode for HW5
+#
+# items in () are code snippets/reminders for myself when translating pcode
+
+
+if there are no arguments (argc is <= 1)
+    print there are no arguments
+    end
+
+initialize options
+
+for all arguments (in argv[])
+    while options can be found from beginning of input
+        store the valid options
+        print error if invalid option
+
+    if no arguments remain
+        list current directory (getcwd())
+        end
+
+    while arguments remain
+        if directory
+            process directory, with flags
+            print error if invalid direcory
+        if file
+            process file, with flags
+            print error if invalid file
+        otherwise
+            print error for argument
+
+
