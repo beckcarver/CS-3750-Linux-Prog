@@ -15,19 +15,32 @@ while option formatted strings can be found from beginning of input
     print error if invalid option
 
 if no arguments after options (end of argv[])
-    list current directory (getcwd())
+    list current directory (getcwd() maybe)
     end
 
 while arguments in argv[] remain
     if directory
-        process directory, with flags
+        call process directory func, with flags
         print error if invalid direcory
     if file
-        process file, with flags
+        call process file/entry func, with flags
         print error if invalid file
     otherwise
         print error for argument
 
+process directory func:
+    open directory
+        if cant report error
+    otherwise
+        for all elements in directory, call process file
 
-
+process file func:
+    check flags
+    print according to flags in the following order:
+        permissions
+        user
+        group
+        size
+        date & time
+        filename/path processed
 

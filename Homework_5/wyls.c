@@ -24,11 +24,6 @@
 #define PATH_MAX 4096
 #define FNAME_MAX 256
 
-// compiler complains about strchr getting a char**, but this is intended
-// ncompatible-pointer-typesbecause argv[] is an array of char*, and we are pointing to the inner char*
-// program fails without &
-
-
 int process_dir(char* drname, int* flags);
 void process_entry(char* fpath, char* fname, int* flags);
 void print_perm(mode_t mode); 
@@ -40,17 +35,18 @@ int main(int argc, char* argv[]) {
     int pstop = 1;
     // searches for options until FIRST argument without '-' is found
     while(pstop < argc && argv[pstop][0] == '-') {
-        pstop++;
-        char opt[] = &argv[pstop][1];
+        char* opt = malloc(sizeof(argv[pstop]));
+        strcpy(opt, argv[pstop]);
+        // compiler is grumpy with argv[pstop] as a char*, so opt is a standin
         if(strchr(opt, 'n')) { 
             flags[0] = 1;
         }
         if(strchr(opt, 'h')) {
             flags[1] = 1;
         }
-        printf(" %c %c\n", (char)flags[0], (char)flags[1]);
+        pstop++;
+        free(opt);
     }
-    printf("pstop = %d\n", pstop);
     
 
 
@@ -131,22 +127,24 @@ void process_entry(char* fpath, char* fname, int* flags) {
 
     // print user/grp id's or names (flag dependent)
     if (flags[0] == 1) {
-        printf(" %10d %10d", spath.st_uid, spath.st_gid);
+        printf(" %-d %-d", spath.st_uid, spath.st_gid);
     }
     else {
-        printf(" %10s %10s", pw->pw_name, gr->gr_name);
+        printf(" %-s %-s", pw->pw_name, gr->gr_name);
     }
 
     // print size bytes or human readable (flag dependent)
     if (flags[1] == 1) {
         double size = (double)spath.st_size;
-        if (size<1024){printf(" %10lf.0", size);}
-        else if (size<1024*1024){printf(" %10f.1K", size/1024.0);}
-        else if (size<1024*1024*1024){printf(" %10lf.1M", size/1024.0/1024.0);}
-        else {printf(" %10lf.1G", size/1024.0/1024.0/1024.0);} 
+        if (size<1024){printf(" %6.0lf", size);}
+        else if (size<1024*1024){printf(" %5.1lfK", size/1024.0);}
+        else if (size<1024*1024*1024){printf(" %5.1lfM",size/1024.0/1024.0);}
+        // max file size in linux 32-bit is 16-terabyte files
+        else {printf(" %5.1lfG", size/1024.0/1024.0/1024.0);} 
     }
     else {
-        printf(" %10ld", spath.st_size);
+        // maximum length of long int
+        printf(" %-10ld", spath.st_size);
     }
 
     // print date (always)
