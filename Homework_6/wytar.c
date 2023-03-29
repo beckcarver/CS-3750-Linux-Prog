@@ -1,7 +1,7 @@
 /* 
  * wytar.c
  * Author: Beckham Carver
- * Date: Mar 29, 2023
+ * Date: Mar 28, 2023
  * 
  * COSC 3750, Homework 6
  *
