@@ -1,0 +1,36 @@
+# Author: Beckham Carver
+#
+# psuedocode for HW5
+#
+# 3/28/23
+
+
+check options:
+if less than 3 arguments, end
+if c and no x, then continue
+or if x and no c, then continue
+	if neither above are true end
+
+look for f in the somewhere in the first 4 elements
+	store that position of f if found
+	if not found end
+
+using flags and position of f call:
+	create archive for -c
+	extract archive for -x
+
+
+for create archive,
+	identify type and create its header
+		store data after header
+	repeat unitl end of files given
+		store null blocks
+
+for extract
+	identify type read
+		create a file and extract
+		position files according to type and other info
+	when we can no longer read any more bytes
+	or null blocks are found
+		end
+
