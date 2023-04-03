@@ -1,0 +1,56 @@
+- make a real plan for shell
+- implement part 1 as if you intend to finish the whole thing
+- use some method of maintaining state
+    - states: command is, args are, use file or stdin, to file or stdout,
+      filename, pipe status, etc.
+    - ex: cat file | wc -l | sed ... | grep -h ...
+- parser gives a single thing back!!
+    - gives a val that tells you what type something is, and a ptr to that
+      string, MUST string duplicate
+    - build a linked list of commands VVVV
+
+typedef CmdLink;
+struct cmdLink
+{
+    // first element of cmd_argv is the command, now can be treated as an argv
+    Argv cmd_argv;
+    int cmd_argc;
+
+    // set depending on pipe
+    int input, output, error;
+    char *infile, *outfile, *errfile;
+
+    struct cmdLink *prev, *next;
+}
+
+typdef CmdArgv;
+struct cmdArgv {
+    char* data, next;
+}
+
+int con_struct_er(blah blah blah, pipe_flag)
+{
+    fill cmd_argv,
+    fill out rest of cmdLink, to default stdin, stdout, etc.
+        change stdin of 'CmdList' in the main program
+        change stdout from HERE!!
+}
+
+- only have to free memory in the main program because exec() will clear out
+  memory afterwards
+
+- to delete a cmdLink we have to traverse and free (free struct after completing
+  whole command)
+
+
+// free linked list code
+while (next not null)
+    current = head
+    head = head->null;
+    for(length of current)
+        free(argv[i])
+    free(current argv)
+    free(current)   
+
+
+
