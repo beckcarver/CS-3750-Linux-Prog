@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 
 #define PORT 51100
 
@@ -34,11 +35,10 @@ int main(int argc, char* argv[]) {
 	char sendbuf[1024];
 	
 	while(fgets(sendbuf, sizeof(sendbuf), stdin) != NULL) {
-		if(write(connect, sendbuf, sizeof(sendbuf)) == -1) {
+		if(write(connect, sendbuf, strlen(sendbuf)) == -1) {
 			perror("failed to write/send");
 			break;
 		}
-		sendbuf[0] = '\0';
 		if (readConnection(connect)) {break;}
 	}
 	

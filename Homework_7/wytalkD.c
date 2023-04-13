@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #define PORT 51100
 
@@ -51,11 +52,10 @@ int main(int argc, char *argv[]) {
 	readConnection(connect);
 
 	while(fgets(sendbuf, sizeof(sendbuf), stdin) != NULL) {
-		if(write(connect, sendbuf, sizeof(sendbuf)) == -1) {
+		if(write(connect, sendbuf, strlen(sendbuf)) == -1) {
 			perror("error in sending/writing data");
 			break;
 		}
-		sendbuf[0] = '\0';
 		if (readConnection(connect)) {break;}
 	}
 	
