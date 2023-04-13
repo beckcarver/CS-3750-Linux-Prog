@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	printf("hostname is %s \n", hostname);
+	//printf("hostname is %s \n", hostname);
 	
 	int socket = serve_socket(hostname, PORT); 		
 	if (socket < 3) {
@@ -45,8 +45,8 @@ int main(int argc, char *argv[]) {
 		return -1;	
 	}
 
-	printf("connection established: host %s, socket %d, connection %d \n",
-			hostname, socket, connect);
+	//printf("connection established: host %s, socket %d, connection %d \n",
+	//		hostname, socket, connect);
 	
 	char sendbuf[1024];
 	readConnection(connect);
