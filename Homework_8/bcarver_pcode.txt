@@ -1,19 +1,24 @@
+--+-- Below are notes, and psuedocode for the final full shell --+--
+
 - make a real plan for shell
 - implement part 1 as if you intend to finish the whole thing
 - use some method of maintaining state
     - states: command is, args are, use file or stdin, to file or stdout,
       filename, pipe status, etc.
     - ex: cat file | wc -l | sed ... | grep -h ...
-- parser gives a single thing back!!
+- parser gives a single thing back!
     - gives a val that tells you what type something is, and a ptr to that
       string, MUST string duplicate
     - build a linked list of commands VVVV
+
+never more than one call to fork (children cannot call fork)
+    if semicolon, fork command, let the child process call exec
 
 typedef CmdLink;
 struct cmdLink
 {
     // first element of cmd_argv is the command, now can be treated as an argv
-    Argv cmd_argv;
+    CmdArgv cmd_argv;
     int cmd_argc;
 
     // set depending on pipe
@@ -51,6 +56,20 @@ while (next not null)
         free(argv[i])
     free(current argv)
     free(current)   
+
+
+intepretting arguments passed from terminal USE switch
+
+rtnval = parseval(command line);
+
+switch(rtnval):
+    case RTNVAL is WORD:
+        if (CmdLink->cmd_argc == null) // this is a command
+
+        else if (infile, outfile, errfile == EXISTS) // this is an argument
+
+        else if (infile == is redirect) // this is a filename
+
 
 
 
