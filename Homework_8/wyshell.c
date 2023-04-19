@@ -171,7 +171,13 @@ int main()
                         runError = 1;
                         break;
                     }
+                    if (current == 0) {
+                        printf("error & : no command present\n");
+                        runError = 1;
+                        break;
+                    }
                     printf(" &\n");
+                    break;
 
                 case PIPE:
                     if (isFile) {
@@ -194,18 +200,28 @@ int main()
                     current = 0;
                     printf(" |\n");
                     break;
-                
+
                 case APPEND_OUT:
                     if (isFile) {
                         printf("error >> : file not given\n");
                         runError = 1;
                         break;
                     }
+                    if (current == 0) {
+                        printf("error >> : no command present\n");
+                        runError = 1;
+                        break;
+                    }             
                     printf(" >>\n");
-
+                    break;
                 case APPEND_ERR:
                     if (isFile) {
                         printf("error << : file not given\n");
+                        runError = 1;
+                        break;
+                    }
+                    if (current == 0) {
+                        printf("error << : no command present\n");
                         runError = 1;
                         break;
                     }
