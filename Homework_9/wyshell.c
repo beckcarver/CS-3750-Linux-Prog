@@ -3,25 +3,23 @@
  * Author: Beckham Carver
  * Date: April 25, 2023
  *
- * COSC 3750, Homework 8
+ * COSC 3750, Homework 9
  *
- * General logic for a shell program, this takes in input from the user
- * and parses that input, then outputs the action to be taken.
- *
- * !!NOTE!!, this does not store the parsed information in a command data 
- * structure, this is only the logic for how to treat the user commands, 
- * consider all printf() calls (not error) portions of the code where we would
- * store the command in our command data structure.
+ * Shell program that that creates a cmdLink structure
+ * and adds arguments to linked-list contained in structure, 
+ * command structures are then also linked together.
+ * Program parses these into seperate arrays for execution at end.
  */
 
-#include<stdio.h>
 #include"wyscanner.h"
+#include"wyargs.h"
+
+#include<stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include<sys/types.h>
 #include<unistd.h>
 #include<sys/wait.h>
-
 
 
 typedef struct word Word;
@@ -43,14 +41,6 @@ struct cmdLink {
     struct cmdLink *prev, *next;
 };
 
-Word* createWord(const char* data);
-Word* appendWord(Word* word, const char* data);
-void freeWords(Word* word);
-
-CmdLink* createCmdLink(const char* cmd_data);
-CmdLink* appendCmdLink(CmdLink* cmdLink, const char* cmd_data);
-void freeCmdLinks(CmdLink* cmdLink);
-
 void execute(char **argv);
 
 
@@ -66,12 +56,14 @@ int main()
     char buf[1024];
 
     int current = 0;
+    int isFile = 0;
+    int runError = 0;
+
+
     int inputDir = 0;
     int errorDir = 0;
     int outputDir = 0;
     int errOut = 0;
-    int isFile = 0;
-    int runError = 0;
 
     while(1) {
         printf("&> ");
@@ -82,7 +74,7 @@ int main()
                 return 0;
             }
             else {
-                perror("fgets from stdin");
+                printf("fgets from stdin\n");
                 return 1;
             }
         }
@@ -105,9 +97,7 @@ int main()
                 case WORD:
                     if (current == 0) {
                         // requires that current is moved to next by pipe/semicolon
-                        currentCmd = createCmdLink(lexeme);
-                        printf("cmd %d\n", currentCmd->cmd_argc);
-                        printf(":STARTED: %s\n", lexeme);
+                        currentCmd = appendCmdLink(currentCmd,lexeme);
                         current = 1;
                         break;
                     }
@@ -118,7 +108,6 @@ int main()
                     // new link not needed, append argv
                     appendWord(currentCmd->cmd_argv, lexeme);
                     currentCmd->cmd_argc++;
-                    printf(":APPEND ARGV: %s\n",lexeme);
                     break;
 
                 case REDIR_OUT:
@@ -138,7 +127,6 @@ int main()
                         break;
                     }
                     outputDir = 1;
-                    printf(" >\n");
                     break;
 
                 case REDIR_IN:
@@ -158,7 +146,6 @@ int main()
                         break;
                     }
                     inputDir = 1;
-                    printf(" <\n");
                     break;
 
                 case REDIR_ERR:
@@ -178,7 +165,6 @@ int main()
                         break;
                     }
                     errorDir = 1;
-                    printf(" 2>\n");
 
                 case REDIR_ERR_OUT:
                     if (errOut == 1){ 
@@ -192,7 +178,6 @@ int main()
                         break;
                     }
                     errOut = 1;
-                    printf(" 2>&1\n");
                     break;
 
                 case SEMICOLON:
@@ -206,15 +191,14 @@ int main()
                         runError = 1;
                         break;
                     }
-                    
+
+                    // these flags will be made unecessary in next HW
                     inputDir = 0;
                     outputDir = 0;
                     errorDir = 0;
                     errOut = 0;
 
                     current = 0;
-                    currentCmd = currentCmd->next;
-                    printf(":SEMICOLON:\n");
                     break;
 
                 case AMP:
@@ -228,7 +212,6 @@ int main()
                         runError = 1;
                         break;
                     }
-                    printf(" &\n");
                     break;
 
                 case PIPE:
@@ -250,9 +233,6 @@ int main()
 
                     inputDir = 1;
                     current = 0;
-
-                    currentCmd = currentCmd->next;
-                    printf(" |\n");
                     break;
 
                 case APPEND_OUT:
@@ -266,7 +246,6 @@ int main()
                         runError = 1;
                         break;
                     }             
-                    printf(" >>\n");
                     break;
                 case APPEND_ERR:
                     if (isFile) {
@@ -279,7 +258,6 @@ int main()
                         runError = 1;
                         break;
                     }
-                    printf(" <<\n");
                     break;
 
                 case QUOTE_ERROR:
@@ -306,16 +284,14 @@ int main()
         if (rtn == EOL && !runError){
             if (isFile) {printf("error EOL : file name not given prior\n");}
             else {
-                printf("--: EOL\n");
                 while(currentCmd->prev != NULL) {
                         currentCmd = currentCmd->prev;
                 }
                 while(currentCmd != NULL) {
-                    printf("NUM is %d", currentCmd->cmd_argc);
                     
                     char** args = (char**)malloc((currentCmd->cmd_argc + 1) * sizeof(char*));
                     if (args == NULL) {
-                        perror("allocation failed");
+                        printf("allocation failed\n");
                         return -1;
                     }
 
@@ -336,83 +312,19 @@ int main()
     }
 }
 
-Word* createWord(const char* data) {
-    Word* newWord = (Word*)malloc(sizeof(Word));
-    newWord->next = NULL;
-    newWord->prev = NULL;
-    newWord->data = strdup(data); // Copy the data string
-    return newWord;
-}
-
-Word* appendWord(Word* word, const char* data) {
-    Word* newWord = createWord(data);
-    Word* currentWord = word;
-    while(currentWord->next != NULL) {
-        currentWord = currentWord->next;
-    }
-    currentWord->next = newWord;
-    newWord->prev = currentWord;
-    return newWord;
-}
-
-CmdLink* createCmdLink(const char* cmd_data) {
-    Word* cmd_argv = createWord(cmd_data); // Create a new Word from cmd_data
-    CmdLink* newCmdLink = (CmdLink*)malloc(sizeof(CmdLink));
-    newCmdLink->cmd_argv = cmd_argv;
-    newCmdLink->cmd_argc = 1;
-    newCmdLink->input = 0;
-    newCmdLink->output = 1;
-    newCmdLink->error = 2;
-    newCmdLink->infile = NULL;
-    newCmdLink->outfile = NULL;
-    newCmdLink->errfile = NULL;
-    newCmdLink->prev = NULL;
-    newCmdLink->next = NULL;
-    return newCmdLink;
-}
-
-CmdLink* appendCmdLink(CmdLink* current, const char* cmd_data) {
-    CmdLink* newCmdLink = createCmdLink(cmd_data);
-    current->next = newCmdLink;
-    newCmdLink->prev = current;
-    return newCmdLink;
-}
-
-
-void freeWords(Word* word) {
-    while (word != NULL) {
-        Word* temp = word;
-        word = word->next;
-        free(temp->data);
-        free(temp);
-    }
-}
-
-void freeCmdLinks(CmdLink* cmdLink) {
-    while (cmdLink != NULL) {
-        CmdLink* tmp = cmdLink;
-        cmdLink = cmdLink->prev;
-        freeWords(tmp->cmd_argv);
-        free(tmp->cmd_argv);
-        free(tmp->infile);
-        free(tmp->outfile);
-        free(tmp->errfile);
-        free(tmp);
-    }
-}
 
 void execute(char** args){
-    pid_t pid;
     int stat;
+    pid_t pid;
     pid = fork();
-    if(pid ==0){
-        if(execvp(*args, args) < 0){
-            printf("wyshell: %s: command not found\n",args[0]);
+    if (pid == 0) {
+        if (execvp(*args, args) < 0) {
+            printf("%s: command not found\n",args[0]);
             exit(1);
         }
         exit(0);
     }
-    if(pid > 0){
+    if (pid > 0) {
         wait(&stat);
     }
 }
