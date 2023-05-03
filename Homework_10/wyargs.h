@@ -1,9 +1,9 @@
 /*
  * wyargs.h
  * Author: Beckham Carver
- * Date: April 25, 2023
+ * Last Modified Date: May 2, 2023
  *
- * COSC 3750, Homework 9
+ * COSC 3750, Homework 10
  *
  * Header file for wyargs.c
  * 

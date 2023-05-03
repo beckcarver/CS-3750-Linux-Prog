@@ -3,9 +3,9 @@
 # # Beckham Carver
 # # COSC 3750, Spring 2024
 # # Homework 8
-# # 4/25/2023
+# # Last Modified Date: May 2, 2023
 # #
-# # Makefile for HW9
+# # Makefile for HW10
 # ##################################
 
 
