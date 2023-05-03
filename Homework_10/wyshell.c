@@ -35,14 +35,14 @@ struct cmdLink {
     int cmd_argc;
 
     // set depending on pipe, pipe = 3
-    int input, output, error;
+    int input, output, error, amp;
     char *infile, *outfile, *errfile;
 
     struct cmdLink *prev, *next;
 };
 
 void execute(char **argv);
-
+void executeNow(char **argv);
 
 int main()
 {
@@ -55,19 +55,19 @@ int main()
     char *rpt;
     char buf[1024];
 
-
     int needFile = 0;
     int runError = 0;
-
 
     int inputDir = 0;
     int errorDir = 0;
     int outputDir = 0;
+    int appendCond = 0;
 
     CmdLink* head;
+    int status;
 
     while(1) {
-        printf("&> ");
+        printf("$> ");
         rpt=fgets(buf,256,stdin);
 
         if(rpt == NULL) {
@@ -79,11 +79,17 @@ int main()
                 return 1;
             }
         }
+
         CmdLink* currentCmd = createEmptyCmdLink();
         head = currentCmd;
 
         needFile = 0;
         runError = 0;
+        
+        // accidentally deleted this line with CTRL+Z while
+        // messing with forks() and then spent THREE BLOODY HOURS
+        // trying to understand why my forks were wrong. They weren't.
+        appendCond = 0;
         
         inputDir = 0;
         errorDir = 0;
@@ -91,15 +97,34 @@ int main()
 
         
 
-
         rtn=parse_line(buf);
+
         while(rtn !=  EOL && !runError){ 
+            //waitpid(-1, &status,WNOHANG)
+            // "convenient" time to wait for children
+
+
             switch(rtn) {
 
                 case WORD:
-                    if (needFile != 0) {
+                    if (needFile) {
                         // update in CmdLink
+                        if (outputDir == 1) {
+                            currentCmd->outfile = strdup(lexeme);
+                        } else if (inputDir == 0) {
+                            currentCmd->infile = strdup(lexeme);
+                        } else if (errorDir == 0) {
+                            currentCmd->errfile = strdup(lexeme);
+                        }
                         needFile = 0;
+                        currentCmd->amp = 0;
+                        break;
+                    }
+                    if (appendCond) {
+                        currentCmd = appendCmdLink(currentCmd);
+                        currentCmd->amp = 0;
+                        // 1 for semicolon, 3 for pipe
+                        currentCmd->input = appendCond;
                     }
                     // new link not needed, append argv
                     appendWord(currentCmd->cmd_argv, lexeme);
@@ -124,6 +149,7 @@ int main()
                     }
                     needFile = 1;
                     outputDir = 1;
+                    currentCmd->amp = 0;
                     break;
 
                 case REDIR_IN:
@@ -144,6 +170,7 @@ int main()
                     }
                     needFile = 1;
                     inputDir = 1;
+                    currentCmd->amp = 0;
                     break;
 
                 case REDIR_ERR:
@@ -164,6 +191,7 @@ int main()
                     }
                     needFile = 1;
                     errorDir = 1;
+                    currentCmd->amp = 0;
                     break;
 
                 case REDIR_ERR_OUT:
@@ -179,6 +207,7 @@ int main()
                     }
                     currentCmd->error = currentCmd->output;
                     errorDir = 1;
+                    currentCmd->amp = 0;
                     break;
 
                 case SEMICOLON:
@@ -190,7 +219,7 @@ int main()
                     inputDir = 0;
                     outputDir = 0;
                     errorDir = 0;
-                    currentCmd = appendCmdLink(currentCmd);
+                    appendCond = 1;
                     break;
 
                 case AMP:
@@ -204,6 +233,7 @@ int main()
                         runError = 1;
                         break;
                     }
+                    currentCmd->amp = 1;
                     break;
 
                 case PIPE:
@@ -223,8 +253,8 @@ int main()
                         break;
                     }
                     currentCmd->output = 3;
-                    currentCmd = appendCmdLink(currentCmd);
-                    currentCmd->input = 3;
+                    currentCmd->amp = 0;
+                    appendCond = 3;
                     break;
 
                 case APPEND_OUT:
@@ -237,7 +267,9 @@ int main()
                         printf("error >> : no command present\n");
                         runError = 1;
                         break;
-                    }             
+                    }
+                    needFile = 1;
+                    currentCmd->amp = 0;             
                     break;
                     
                 case APPEND_ERR:
@@ -251,6 +283,8 @@ int main()
                         runError = 1;
                         break;
                     }
+                    needFile = 1;
+                    currentCmd->amp = 0;
                     break;
 
                 case QUOTE_ERROR:
@@ -263,7 +297,7 @@ int main()
                     return 1;
 
                 case ERROR_CHAR:
-                    printf("error char: %d",error_char);
+                    printf("error char: %d\n",error_char);
                     runError = 1;
                     break;
 
@@ -274,67 +308,95 @@ int main()
             }
             rtn=parse_line(NULL);
         }
-        
+
+        while(wait(NULL) > 0);
+
         if (rtn == EOL && !runError){
             if (needFile) {
                 printf("error EOL : file name not given prior\n");
             }
-            else if (currentCmd->cmd_argc == 0) {}
+            else if (head->cmd_argc == 0) {}
             else {
-                while(currentCmd->prev != NULL) {
-                    printf("    traversed back\n");
-                    currentCmd = currentCmd->prev;
-                }
-                    while(currentCmd != NULL) {
-                        printf("\n    NEW COMMAND ");
-                        char** args = (char**)calloc((currentCmd->cmd_argc + 1), sizeof(char*));
-                        if (args == NULL) {
-                            printf("allocation failed\n");
-                            return -1;
-                        }
+                // Last cmd
+                int ampAll = currentCmd->amp;
+                // first command
+                currentCmd = head;
+                printf("amp is %d\n", currentCmd->amp);
+                while(currentCmd != NULL) {
 
-                        Word* tmp = currentCmd->cmd_argv;
-                        for(int i = 0; i <currentCmd->cmd_argc; i++) {
-                            if(tmp->data != NULL) {
-                                args[i] = tmp->data;
-                                tmp = tmp->next;
-                            } else {
-                                i = currentCmd->cmd_argc;
-                            }
-                        }
-                        args[currentCmd->cmd_argc] = '\0';
-                        printf("%d| ", currentCmd->cmd_argc);
-                        for(int i = 0; i <= currentCmd->cmd_argc; i++) {
-                            printf("%s :: ", args[i]);
-                        }
+                    // Allocate args array
+                    printf("----NEW COMMAND (");
+                    char** args = (char**)calloc((currentCmd->cmd_argc + 1), sizeof(char*));
+                    if (args == NULL) {
+                        printf("allocation failed\n");
+                        return -1;
+                    }
 
-                        currentCmd = currentCmd->next;
-                        if(args != NULL) {
-                            printf("\n          execute\n");
+                    // Fill args array
+                    Word* tmp = currentCmd->cmd_argv;
+                    for(int i = 0; i <currentCmd->cmd_argc; i++) {
+                        if(tmp->data != NULL) {
+                            args[i] = tmp->data;
+                            tmp = tmp->next;
+                        } else {
+                            i = currentCmd->cmd_argc;                            
+                        }
+                    }
+                    args[currentCmd->cmd_argc] = '\0';
+
+                    // Debug
+                    printf("%d) ", currentCmd->cmd_argc);
+                    for(int i = 0; i <= currentCmd->cmd_argc; i++) {
+                        printf("%s :: ", args[i]);
+                    }
+
+                    // Execute args array
+                    printf("\n");
+                    if(args[0] != NULL) {
+                        if (currentCmd->amp || ampAll) {
+                            printf("-------executeNow\n");
+                            executeNow(args);
+                        } else {
+                            printf("-------execute\n");
                             execute(args);
+                        }
+                    currentCmd = currentCmd->next;
                     } 
                 }
                 
             }
         }
-
         freeCmdLinks(head);
     }
 }
 
 
-void execute(char** args){
-    int stat;
+void execute(char** argv){
+    int status;
     pid_t pid;
     pid = fork();
     if (pid == 0) {
-        if (execvp(args[0], args) < 0) {
-            printf("%s: command not found\n",args[0]);
+        if (execvp(argv[0], argv) < 0) {
+            printf("%s: command not found\n",argv[0]);
             exit(1);
         }
         exit(0);
     }
     if (pid > 0) {
-        wait(&stat);
+        wait(&status);
     }
 }
+
+void executeNow(char** argv){
+
+    pid_t pid;
+    pid = fork();
+    if(pid == 0){
+        if(execvp(argv[0], argv) < 0){
+            printf("%s: command not found\n", argv[0]);
+            exit(1);
+        }
+        exit(0);
+    }
+}
+

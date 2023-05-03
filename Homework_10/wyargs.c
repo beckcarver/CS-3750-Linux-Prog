@@ -28,7 +28,7 @@ struct cmdLink {
     int cmd_argc;
 
     // set depending on pipe
-    int input, output, error;
+    int input, output, error, amp;
     char *infile, *outfile, *errfile;
 
     struct cmdLink *prev, *next;
@@ -63,6 +63,7 @@ CmdLink* createEmptyCmdLink() {
     newCmdLink->input = 0;
     newCmdLink->output = 1;
     newCmdLink->error = 2;
+    newCmdLink->amp = 0;
     newCmdLink->infile = NULL;
     newCmdLink->outfile = NULL;
     newCmdLink->errfile = NULL;
@@ -83,16 +84,17 @@ void freeWords(Word* word) {
     if (word == NULL) {
         return;
     }
+    //printf("----free WORD\n");
     freeWords(word->next);
-    free(word);
-    free(word->data);    
+    free(word->data);   
+    free(word); 
 }
 
 void freeCmdLinks(CmdLink* cmdLink) {
     if (cmdLink == NULL) {
         return;
     }
-    printf("free LINK\n");
+    //printf("free LINK\n");
     freeWords(cmdLink->cmd_argv);
     freeCmdLinks(cmdLink->next);
     free(cmdLink->infile);
