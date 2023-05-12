@@ -1,11 +1,12 @@
 /*
+ * Beckham Carver
  * mmult.c
  *
  * COSC 3750, Homework 11
  *
- * This is the code for the mmult program. It multiplies
- * two matrices with the given nummber of threads and
- * stores the result in an output file.
+ * Code parralelizes matrix multiplication
+ * using pthreads and writes final binary
+ * to file.
  *
  */
 
